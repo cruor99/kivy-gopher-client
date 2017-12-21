@@ -1,0 +1,15 @@
+#:import MDThemePicker kivymd.theme_picker.MDThemePicker
+#:import NavigationDrawerToolbar kivymd.navigationdrawer.NavigationDrawerToolbar
+
+<GopherNavdrawer>:
+    NavigationDrawerToolbar:
+        title: "Cruor99 Gopher Client"
+        right_action_items: [["close", lambda x: app.root.ids.nav_layout.toggle_nav_drawer()]]
+    NavigationDrawerIconButton:
+        icon: "home"
+        text: "Main Browser"
+        on_release: app.root.next_screen("start_screen")
+    NavigationDrawerIconButton:
+        icon: "brush"
+        text: "Alter Theme"
+        on_release: MDThemePicker().open()

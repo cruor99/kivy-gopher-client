@@ -1,9 +1,3 @@
-#! /usr/bin/env python
-
-# A simple gopher client.
-#
-# Usage: gopher [ [selector] host [port] ]
-
 import string
 import sys
 import os
@@ -11,22 +5,22 @@ import socket
 
 # Default selector, host and port
 DEF_SELECTOR = ''
-DEF_HOST     = 'gopher.micro.umn.edu'
-DEF_PORT     = 70
+DEF_HOST = 'gopher.micro.umn.edu'
+DEF_PORT = 70
 
 # Recognized file types
-T_TEXTFILE  = '0'
-T_MENU      = '1'
-T_CSO       = '2'
-T_ERROR     = '3'
-T_BINHEX    = '4'
-T_DOS       = '5'
-T_UUENCODE  = '6'
-T_SEARCH    = '7'
-T_TELNET    = '8'
-T_BINARY    = '9'
+T_TEXTFILE = '0'
+T_MENU = '1'
+T_CSO = '2'
+T_ERROR = '3'
+T_BINHEX = '4'
+T_DOS = '5'
+T_UUENCODE = '6'
+T_SEARCH = '7'
+T_TELNET = '8'
+T_BINARY = '9'
 T_REDUNDANT = '+'
-T_SOUND     = 's'
+T_SOUND = 's'
 
 # Dictionary mapping types to strings
 typename = {'0': '<TEXT>', '1': '<DIR>', '2': '<CSO>', '3': '<ERROR>', \
@@ -36,6 +30,7 @@ typename = {'0': '<TEXT>', '1': '<DIR>', '2': '<CSO>', '3': '<ERROR>', \
 # Oft-used characters and strings
 CRLF = '\r\n'
 TAB = '\t'
+
 
 # Open a TCP connection to a given host and port
 def open_socket(host, port):
@@ -47,12 +42,17 @@ def open_socket(host, port):
     s.connect((host, port))
     return s
 
+
 # Send a selector to a given host and port, return a file with the reply
 def send_request(selector, host, port):
+    print("Selector {}".format(selector))
+    print("Host {}".format(host))
+    print("Port {}".format(port))
     s = open_socket(host, port)
     s.send(selector + CRLF)
     s.shutdown(1)
     return s.makefile('r')
+
 
 # Get a menu in the form of a list of entries
 def get_menu(selector, host, port):
@@ -75,20 +75,22 @@ def get_menu(selector, host, port):
         typechar = line[0]
         parts = string.splitfields(line[1:], TAB)
         if len(parts) < 4:
-            print '(Bad line from server: %r)' % (line,)
+            print '(Bad line from server: %r)' % (line, )
             continue
         if len(parts) > 4:
-            print '(Extra info from server: %r)' % (parts[4:],)
+            print '(Extra info from server: %r)' % (parts[4:], )
         parts.insert(0, typechar)
         list.append(parts)
     f.close()
     return list
 
+
 # Get a text file as a list of lines, with trailing CRLF stripped
 def get_textfile(selector, host, port):
-    list = []
-    get_alt_textfile(selector, host, port, list.append)
-    return list
+    text_list = []
+    get_alt_textfile(selector, host, port, text_list.append)
+    return text_list
+
 
 # Get a text file and pass each line to a function, with trailing CRLF stripped
 def get_alt_textfile(selector, host, port, func):
@@ -109,12 +111,14 @@ def get_alt_textfile(selector, host, port, func):
         func(line)
     f.close()
 
+
 # Get a binary file as one solid data block
 def get_binary(selector, host, port):
     f = send_request(selector, host, port)
     data = f.read()
     f.close()
     return data
+
 
 # Get a binary file and pass each block to a function
 def get_alt_binary(selector, host, port, func, blocksize):
@@ -125,7 +129,9 @@ def get_alt_binary(selector, host, port, func, blocksize):
             break
         func(data)
 
+
 # A *very* simple interactive browser
+
 
 # Browser main command, has default arguments
 def browser(*args):
@@ -149,6 +155,7 @@ def browser(*args):
     except KeyboardInterrupt:
         print '\n[Goodbye]'
 
+
 # Browse a menu
 def browse_menu(selector, host, port):
     list = get_menu(selector, host, port)
@@ -160,7 +167,7 @@ def browse_menu(selector, host, port):
         for i in range(len(list)):
             item = list[i]
             typechar, description = item[0], item[1]
-            print string.rjust(repr(i+1), 3) + ':', description,
+            print string.rjust(repr(i + 1), 3) + ':', description,
             if typename.has_key(typechar):
                 print typename[typechar]
             else:
@@ -183,7 +190,7 @@ def browse_menu(selector, host, port):
                 print 'Choice out of range; try again:'
                 continue
             break
-        item = list[choice-1]
+        item = list[choice - 1]
         typechar = item[0]
         [i_selector, i_host, i_port] = item[2:5]
         if typebrowser.has_key(typechar):
@@ -194,6 +201,7 @@ def browse_menu(selector, host, port):
                 print '***', sys.exc_type, ':', sys.exc_value
         else:
             print 'Unsupported object type'
+
 
 # Browse a text file
 def browse_textfile(selector, host, port):
@@ -217,6 +225,7 @@ def browse_textfile(selector, host, port):
         print 'IOError:', msg
     x.close()
 
+
 # Browse a search index
 def browse_search(selector, host, port):
     while 1:
@@ -237,6 +246,7 @@ def browse_search(selector, host, port):
             continue
         browse_menu(selector + TAB + query, host, port)
 
+
 # "Browse" telnet-based information, i.e. open a telnet session
 def browse_telnet(selector, host, port):
     if selector:
@@ -247,18 +257,21 @@ def browse_telnet(selector, host, port):
     if sts:
         print 'Exit status:', sts
 
+
 # "Browse" a binary file, i.e. save it to a file
 def browse_binary(selector, host, port):
     f = open_savefile()
     if not f:
         return
     x = SaveWithProgress(f)
-    get_alt_binary(selector, host, port, x.write, 8*1024)
+    get_alt_binary(selector, host, port, x.write, 8 * 1024)
     x.close()
+
 
 # "Browse" a sound file, i.e. play it or save it
 def browse_sound(selector, host, port):
     browse_binary(selector, host, port)
+
 
 # Dictionary mapping types to browser functions
 typebrowser = {'0': browse_textfile, '1': browse_menu, \
@@ -266,30 +279,37 @@ typebrowser = {'0': browse_textfile, '1': browse_menu, \
         '7': browse_search, \
         '8': browse_telnet, '9': browse_binary, 's': browse_sound}
 
+
 # Class used to save lines, appending a newline to each line
 class SaveLines:
     def __init__(self, f):
         self.f = f
+
     def writeln(self, line):
         self.f.write(line + '\n')
+
     def close(self):
         sts = self.f.close()
         if sts:
             print 'Exit status:', sts
 
+
 # Class used to save data while showing progress
 class SaveWithProgress:
     def __init__(self, f):
         self.f = f
+
     def write(self, data):
         sys.stdout.write('#')
         sys.stdout.flush()
         self.f.write(data)
+
     def close(self):
         print
         sts = self.f.close()
         if sts:
             print 'Exit status:', sts
+
 
 # Ask for and open a save file, or return None if not to save
 def open_savefile():
@@ -321,6 +341,7 @@ def open_savefile():
     print 'Saving to', repr(savefile), '...'
     return f
 
+
 # Test program
 def test():
     if sys.argv[4:]:
@@ -343,5 +364,7 @@ def test():
     else:
         browser()
 
-# Call the test program as a main program
-test()
+
+if __name__ == "__main__":
+    # Call the test program as a main program
+    test()

@@ -1,0 +1,28 @@
+<StartScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        Toolbar:
+            id: toolbar
+            title: "Jobber"
+            left_action_items: [["menu", lambda x: app.root.ids.nav_layout.toggle_nav_drawer()]]
+            md_bg_color: app.theme_cls.primary_color
+            # This is merely to get white text. Weird bug going on?
+            background_palette: "Red"
+        FloatLayout:
+            RecycleView:
+                id: jobscroll
+                scroll_timeout: 20
+                MDList:
+                    id: menu_list
+                    size_hint_x: 1
+
+
+
+<UrlPopup>:
+    title: "Write your URL"
+    size_hint: .8, None
+    height: dp(200)
+    MDTextField:
+        hint_text: "example: mushmouth.tech"
+        on_text: root.url = self.text
+        on_text_validate: root.dismiss()

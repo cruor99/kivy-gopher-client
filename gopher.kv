@@ -1,0 +1,16 @@
+#: import NavigationLayout kivymd.navigationdrawer.NavigationLayout
+#: import GopherNavdrawer components.navdrawer.GopherNavdrawer
+<GopherRoot>:
+    #canvas.before:
+    #    Rectangle:
+    #        pos: self.pos
+    #        size: self.size
+    #        source: "img/main_bg.png"
+    orientation: "vertical"
+    NavigationLayout:
+        id: nav_layout
+        GopherNavdrawer:
+            id: nav_drawer
+        ScreenManager:
+            id: gopher_screen_manager
+
