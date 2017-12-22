@@ -10,6 +10,9 @@ from kivymd.button import MDIconButton
 from kivymd.dialog import MDDialog
 from kivymd.textfields import MDTextField
 
+# Helper methods
+from utils.urlref import add_refs
+
 Builder.load_file("kv/screens/textscreen.kv")
 
 
@@ -20,6 +23,6 @@ class TextScreen(Screen):
     def on_enter(self):
         log.info("Text Lines: {}".format(len(self.text_lines)))
         for line in self.text_lines:
-            self.file_text += line+"\n"
+            self.file_text += add_refs(line)+"\n"
 
 
