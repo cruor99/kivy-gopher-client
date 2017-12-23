@@ -11,10 +11,17 @@
         FloatLayout:
             RecycleView:
                 id: jobscroll
-                scroll_timeout: 20
                 MDList:
                     id: menu_list
                     size_hint_x: 1
+            MDFloatingActionButton:
+                icon: "magnify"
+                size_hint: None, None
+                size: dp(56), dp(56)
+                opposite_colors: True
+                elevation_normal: 8
+                pos_hint: {"center_x": .9, "center_y": .1}
+                on_release: root.url_popup()
 
 
 
@@ -23,6 +30,6 @@
     size_hint: .8, None
     height: dp(200)
     MDTextField:
-        hint_text: "example: mushmouth.tech"
+        hint_text: "example: sdf.org"
         on_text: root.url = self.text
         on_text_validate: root.dismiss()

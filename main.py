@@ -12,7 +12,9 @@ from kivymd.snackbar import Snackbar
 # gopher client stuff
 from gopher import get_menu, get_textfile, get_binary
 
-#print(get_menu("", "mushmouth.tech", "70"))
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 
 class GopherRoot(BoxLayout):

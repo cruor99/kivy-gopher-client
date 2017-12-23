@@ -19,6 +19,9 @@ from kivymd.label import MDLabel
 # Helper methods
 from utils.urlref import add_refs
 
+# Base python methods
+from functools import partial
+
 Builder.load_file("kv/screens/startscreen.kv")
 
 
@@ -38,6 +41,7 @@ class UrlPopup(MDDialog):
 class StartScreen(Screen):
     current_menu = ListProperty([])
     first_startup = BooleanProperty(True)
+    menu_jobs = ListProperty([])
 
     def on_enter(self):
         if self.first_startup:
@@ -59,7 +63,11 @@ class StartScreen(Screen):
     def generate_menu(self, *args):
         self.ids.menu_list.clear_widgets()
         info_list_lines = []
+        adding_interval = 0
+        for job in self.menu_jobs:
+            job.cancel()
         for item in self.current_menu:
+            adding_interval += .1
             item_type = item[0]
             item_description = item[1]
             item_ending = item[2]
@@ -89,10 +97,6 @@ class StartScreen(Screen):
                         size_hint_x=.8,
                         size_hint_y=None,
                         height=dp(35) * len(info_list_lines))
-                    info_recycleview = RecycleView(pos_hint={
-                        "center_x": .5,
-                        "center_y": .5
-                    })
                     info_text = ""
                     for line in info_list_lines:
                         info_text += add_refs(line) + "\n"
@@ -111,10 +115,13 @@ class StartScreen(Screen):
                     info_layout.add_widget(info_label)
                     #info_card.height = info_l
                     info_card.add_widget(info_layout)
-                    self.ids.menu_list.add_widget(info_card)
-                self.ids.menu_list.add_widget(base_menu_item)
+                    self.add_menu_widget(info_card)
+                self.add_menu_widget(base_menu_item)
             if item_type == "i":
                 info_list_lines.append(item_description)
+
+    def add_menu_widget(self, widget, *args):
+        self.ids.menu_list.add_widget(widget)
 
     def pressed_item(self, instance):
         log.info("Item URL: {}".format(instance.url))
